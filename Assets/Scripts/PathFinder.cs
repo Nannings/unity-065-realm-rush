@@ -10,7 +10,8 @@ public class PathFinder : MonoBehaviour
     Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
 
     Queue<Waypoint> queue = new Queue<Waypoint>();
-    [SerializeField] bool isRunning = true;
+    bool isRunning = true;
+    Waypoint searchCenter;
 
     Vector2Int[] directions =
     {
@@ -34,25 +35,22 @@ public class PathFinder : MonoBehaviour
 
         while(queue.Count > 0 && isRunning)
         {
-            var searchCenter = queue.Dequeue();
+            searchCenter = queue.Dequeue();
             searchCenter.isExplored = true;
-            HaltIfEndFound(searchCenter);
-            ExploreNeighbours(searchCenter);
+            HaltIfEndFound();
+            ExploreNeighbours();
         }
-
-        print("finished");
     }
 
-    private void HaltIfEndFound(Waypoint searchCenter)
+    private void HaltIfEndFound()
     {
         if (searchCenter == endWaypoint)
         {
-            print("haltifendfound");
             isRunning = false;
         }
     }
 
-    private void ExploreNeighbours(Waypoint from)
+    private void ExploreNeighbours()
     {
         if (!isRunning)
         {
@@ -61,7 +59,7 @@ public class PathFinder : MonoBehaviour
 
         foreach(Vector2Int direction in directions)
         {
-            Vector2Int neighbourCoordinates = (from.GetGridPos() + direction);
+            Vector2Int neighbourCoordinates = (searchCenter.GetGridPos() + direction);
             try
             {
                 QueueNewNeighbours(neighbourCoordinates);
@@ -73,13 +71,13 @@ public class PathFinder : MonoBehaviour
     private void QueueNewNeighbours(Vector2Int neighbourCoordinates)
     {
         Waypoint neighbour = grid[neighbourCoordinates];
-        if (neighbour.isExplored)
+        if (neighbour.isExplored || queue.Contains(neighbour))
         {
         }
         else
         {
-            neighbour.SetTopColor(Color.blue);
             queue.Enqueue(neighbour);
+            neighbour.exploredFrom = searchCenter;
         }
     }
 
