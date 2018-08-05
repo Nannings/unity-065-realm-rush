@@ -8,10 +8,10 @@ public class PathFinder : MonoBehaviour
     [SerializeField] Waypoint startWaypoint, endWaypoint;
 
     Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
-
     Queue<Waypoint> queue = new Queue<Waypoint>();
     bool isRunning = true;
     Waypoint searchCenter;
+    List<Waypoint> path = new List<Waypoint>();
 
     Vector2Int[] directions =
     {
@@ -21,15 +21,31 @@ public class PathFinder : MonoBehaviour
         Vector2Int.left
     };
 
-    private void Start()
+    public List<Waypoint> GetPath()
     {
         LoadBlocks();
         ColorStartAndEnd();
-        Pathfind();
-        //ExploreNeighbours();
+        BreadthFirstSearch();
+        CreatePath();
+
+        return path;
+    }
+    private void CreatePath()
+    {
+        path.Add(endWaypoint);
+
+        Waypoint previous = endWaypoint.exploredFrom;
+        while(previous != startWaypoint)
+        {
+            path.Add(previous);
+            previous = previous.exploredFrom;
+        }
+
+        path.Add(startWaypoint);
+        path.Reverse();
     }
 
-    private void Pathfind()
+    private void BreadthFirstSearch()
     {
         queue.Enqueue(startWaypoint);
 
@@ -60,11 +76,11 @@ public class PathFinder : MonoBehaviour
         foreach(Vector2Int direction in directions)
         {
             Vector2Int neighbourCoordinates = (searchCenter.GetGridPos() + direction);
-            try
+
+            if (grid.ContainsKey(neighbourCoordinates))
             {
                 QueueNewNeighbours(neighbourCoordinates);
             }
-            catch { }
         }
     }
 
@@ -103,10 +119,5 @@ public class PathFinder : MonoBehaviour
                 waypoint.SetTopColor(Color.cyan);
             }
         }
-    }
-
-    private void Update()
-    {
-        
     }
 }
