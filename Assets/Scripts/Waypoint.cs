@@ -21,9 +21,8 @@ public class Waypoint : MonoBehaviour
         return new Vector2Int(Mathf.RoundToInt(transform.position.x / gridSize), Mathf.RoundToInt(transform.position.z / gridSize));
     }
 
-    public void SetTopColor(Color color)
+    private void OnMouseOver()
     {
-        MeshRenderer meshRenderer = transform.Find("Top").GetComponent<MeshRenderer>();
-        meshRenderer.material.color = color;
+        print(gameObject.name);
     }
 }
