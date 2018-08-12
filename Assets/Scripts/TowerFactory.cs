@@ -7,10 +7,12 @@ public class TowerFactory : MonoBehaviour
     [SerializeField] int towerLimit = 5;
     [SerializeField] Tower towerPrefab;
 
-    int numTowers = 0;
+    Queue<Tower> towerQueue = new Queue<Tower>(); 
 
     public void AddTower(Waypoint baseWaypoint)
     {
+        int numTowers = towerQueue.Count;
+
         if (numTowers < towerLimit)
         {
             InstantiateNewTower(baseWaypoint);
@@ -23,13 +25,16 @@ public class TowerFactory : MonoBehaviour
 
     private void InstantiateNewTower(Waypoint baseWaypoint)
     {
-        Instantiate(towerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+        Tower newTower = Instantiate(towerPrefab, baseWaypoint.transform.position, Quaternion.identity);
         baseWaypoint.isPlaceable = false;
-        numTowers++;
+
+        towerQueue.Enqueue(newTower);
     }
 
-    private static void MoveExistingTower()
+    private void MoveExistingTower()
     {
-        Debug.Log("max towers reached");
+        Tower oldTower = towerQueue.Dequeue();
+
+        towerQueue.Enqueue(oldTower);
     }
 }
